@@ -11,11 +11,15 @@ Since Pluto TV shut down its old v1 stitcher, every stream now requires a JWT se
 Download the latest generated playlist:
 
 ```sh
-curl -O https://raw.githubusercontent.com/FainiDenis/pluto-tv-m3u/main/pluto.m3u
+curl -O https://raw.githubusercontent.com/chapkazi25-web/pluto-tv-m3u/main/pluto.m3u
 ```
 
 - **VLC:** `vlc pluto.m3u`
 - **Tivimate:** add the playlist URL above as a new IPTV playlist source.
+
+```sh
+https://raw.githubusercontent.com/chapkazi25-web/pluto-tv-m3u/main/pluto.m3u
+```
 
 ### Generate it yourself
 
