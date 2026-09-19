@@ -1,0 +1,35 @@
+name: Refresh Pluto playlist
+
+on:
+  schedule:
+    - cron: "0 6,18 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Regenerate pluto.m3u with fresh token
+        run: python3 pluto_m3u.py
+
+      - name: Commit updated playlist
+        run: |
+          if git diff --quiet pluto.m3u; then
+            echo "No changes to pluto.m3u"
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add pluto.m3u
+            git commit -m "ci: refresh pluto token and playlist"
+            git push
+          fi
