@@ -43,5 +43,14 @@ jobs:
 
           git commit -m "ci: refresh pluto token and playlist"
 
-          git pull --rebase origin main
-          git push origin HEAD:main
+          for attempt in 1 2 3; do
+            if git pull --rebase origin main && git push origin HEAD:main; then
+              exit 0
+            fi
+
+            echo "Push attempt $attempt failed; retrying..."
+            sleep 10
+          done
+
+          exit 1
+
