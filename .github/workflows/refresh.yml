@@ -2,18 +2,25 @@ name: Refresh Pluto playlist
 
 on:
   schedule:
-    - cron: "0 6,18 * * *"
+    - cron: "0 */12 * * *"
   workflow_dispatch:
 
 permissions:
   contents: write
 
+concurrency:
+  group: refresh-pluto-playlist
+  cancel-in-progress: false
+
 jobs:
   refresh:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
@@ -24,12 +31,17 @@ jobs:
 
       - name: Commit updated playlist
         run: |
-          if git diff --quiet pluto.m3u; then
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add pluto.m3u
+
+          if git diff --cached --quiet; then
             echo "No changes to pluto.m3u"
-          else
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add pluto.m3u
-            git commit -m "ci: refresh pluto token and playlist"
-            git push
+            exit 0
           fi
+
+          git commit -m "ci: refresh pluto token and playlist"
+
+          git pull --rebase origin main
+          git push origin HEAD:main
